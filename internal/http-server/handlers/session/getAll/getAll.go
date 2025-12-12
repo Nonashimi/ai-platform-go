@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	res "project-go/internal/http-server/dto/response"
+	sessionService "project-go/internal/http-server/service/session"
 	"project-go/internal/lib/api/response"
 	"project-go/internal/lib/auth"
 	"project-go/internal/models"
@@ -20,7 +21,7 @@ type Response struct {
 	Sessions []res.SessionResponse
 }
 
-func New(log *slog.Logger, SesSessionGetAll SessionGetAll) http.HandlerFunc {
+func New(log *slog.Logger, sessionService *sessionService.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.session.getAll.New"
 		log = log.With(
@@ -33,7 +34,7 @@ func New(log *slog.Logger, SesSessionGetAll SessionGetAll) http.HandlerFunc {
 			render.JSON(w, r, response.Error("user id is null"))
 			return
 		}
-		sessions, err := SesSessionGetAll.GetAllSessions(userId)
+		sessions, err := sessionService.GetAllSessions(userId)
 		if err != nil {
 			log.Error("failed to get all sessions")
 			render.JSON(w, r, response.Error("failed to get all sessions"))

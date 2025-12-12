@@ -5,6 +5,7 @@ import (
 	"net/http"
 	req "project-go/internal/http-server/dto/request"
 	res "project-go/internal/http-server/dto/response"
+	testservice "project-go/internal/http-server/service/test"
 	"project-go/internal/lib/api/response"
 	"project-go/internal/models"
 
@@ -25,7 +26,7 @@ type Response struct {
 	Test res.TestResponse
 }
 
-func New(log *slog.Logger, TestCreate TestCreate) http.HandlerFunc {
+func New(log *slog.Logger, testService *testservice.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.test.test.New"
 		log = log.With(
@@ -45,14 +46,12 @@ func New(log *slog.Logger, TestCreate TestCreate) http.HandlerFunc {
 			render.JSON(w, r, response.Error("text field is empty"))
 			return
 		}
-		testModel := mapTestRequestToModel(req)
-		createdTest, err := TestCreate.CreateTest(testModel)
+		createdTest, err := testService.TestCreate(req)
 		if err != nil {
 			log.Error("failed to create test", slog.String("error", err.Error()))
 			render.JSON(w, r, response.Error("failed to create test"))
 			return
 		}
-
 		var questionsResp []res.QuestionResponse
 		for _, q := range createdTest.Questions {
 			var optionsResp []res.OptionResponse
@@ -82,28 +81,4 @@ func New(log *slog.Logger, TestCreate TestCreate) http.HandlerFunc {
 		})
 
 	}
-}
-
-// маппим TestRequest в models.Test
-func mapTestRequestToModel(req req.TestRequest) *models.Test {
-	test := &models.Test{
-		Title:       req.Title,
-		Description: req.Description,
-	}
-
-	for _, q := range req.Questions {
-		question := models.TestQuestion{
-			Question: q.Question,
-		}
-		for _, o := range q.Options {
-			option := models.TestOption{
-				OptionText: o.OptionText,
-				IsCorrect:  o.IsCorrect,
-			}
-			question.Options = append(question.Options, option)
-		}
-		test.Questions = append(test.Questions, question)
-	}
-
-	return test
 }

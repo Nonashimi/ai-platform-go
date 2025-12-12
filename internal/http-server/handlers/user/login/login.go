@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	req "project-go/internal/http-server/dto/request"
+	userservice "project-go/internal/http-server/service/user"
 	"project-go/internal/lib/api/response"
 	"project-go/internal/lib/jwt"
 	"project-go/internal/lib/password"
@@ -22,7 +23,7 @@ type Response struct {
 	Token string
 }
 
-func New(log *slog.Logger, UserFindByEmail UserFindByEmail, jwtService *jwt.JWTService) http.HandlerFunc {
+func New(log *slog.Logger, userservice *userservice.Service, jwtService *jwt.JWTService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.user.login.New"
 		log = log.With(
@@ -43,7 +44,7 @@ func New(log *slog.Logger, UserFindByEmail UserFindByEmail, jwtService *jwt.JWTS
 			return
 		}
 		email := req.Email
-		FoundUser, err := UserFindByEmail.FindUserByEmail(email)
+		FoundUser, err := userservice.FindUserByEmail(email)
 		if err != nil {
 			log.Error("The email is not correct", slog.String("error", err.Error()))
 			render.JSON(w, r, response.Error("The email is not correct"))

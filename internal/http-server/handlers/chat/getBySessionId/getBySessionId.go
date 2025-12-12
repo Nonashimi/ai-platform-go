@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	res "project-go/internal/http-server/dto/response"
+	chatservice "project-go/internal/http-server/service/chat"
 	"project-go/internal/lib/api/response"
 	"project-go/internal/models"
 	"strconv"
@@ -22,7 +23,7 @@ type Response struct {
 	Chats []res.ChatResponse
 }
 
-func New(log *slog.Logger, ChaChatGetBySessionId ChatGetBySessionId) http.HandlerFunc {
+func New(log *slog.Logger, service *chatservice.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.chat.getBySessionId.New"
 		log = log.With(
@@ -41,11 +42,12 @@ func New(log *slog.Logger, ChaChatGetBySessionId ChatGetBySessionId) http.Handle
 			render.JSON(w, r, response.Error("invalid session id"))
 			return
 		}
-		chats, err := ChaChatGetBySessionId.GetChatBySessionId(uint(sessionId))
+		chats, err := service.GetChatBySessionId(uint(sessionId))
 
 		if err != nil {
 			log.Error("failed to get chats by session id")
 			render.JSON(w, r, response.Error("failed to get chats by session id"))
+			return
 		}
 		responses := make([]res.ChatResponse, len(chats))
 		for i, ch := range chats {
@@ -53,7 +55,7 @@ func New(log *slog.Logger, ChaChatGetBySessionId ChatGetBySessionId) http.Handle
 				ID:              ch.ID,
 				SessionID:       ch.Session.ID,
 				SessionTitle:    ch.Session.Title,
-				MessageFromUser: ch.MessageFromBot,
+				MessageFromUser: ch.MessageFromUser,
 				MessageFromBot:  ch.MessageFromBot,
 				CreatedAt:       ch.CreatedAt,
 			}

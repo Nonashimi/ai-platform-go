@@ -5,6 +5,7 @@ import (
 	"net/http"
 	req "project-go/internal/http-server/dto/request"
 	res "project-go/internal/http-server/dto/response"
+	userservice "project-go/internal/http-server/service/user"
 	"project-go/internal/lib/api/response"
 	"project-go/internal/lib/password"
 	"project-go/internal/models"
@@ -22,7 +23,7 @@ type Response struct {
 	User res.ResponseUser
 }
 
-func New(log *slog.Logger, UserCreate UserCreate) http.HandlerFunc {
+func New(log *slog.Logger, userservice *userservice.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers/user/create/New"
 		log = log.With(
@@ -62,7 +63,7 @@ func New(log *slog.Logger, UserCreate UserCreate) http.HandlerFunc {
 			Role:     models.Role(req.Role),
 		}
 
-		newUser, err := UserCreate.CreateUser(&user)
+		newUser, err := userservice.CreateUser(&user)
 		if err != nil {
 			log.Error("failed to create user", slog.String("error", err.Error()))
 			render.JSON(w, r, response.Error("failed to create user"))
