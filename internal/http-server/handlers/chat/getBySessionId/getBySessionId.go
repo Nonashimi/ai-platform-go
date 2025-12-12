@@ -15,7 +15,7 @@ import (
 )
 
 type ChatGetBySessionId interface {
-	GetChatBySessionId(sessionId uint) ([]models.ChatHistory, error)
+	GetChatBySessionId(sessionId uint) ([]models.ChatMessage, error)
 }
 
 type Response struct {
@@ -51,14 +51,7 @@ func New(log *slog.Logger, service *chatservice.Service) http.HandlerFunc {
 		}
 		responses := make([]res.ChatResponse, len(chats))
 		for i, ch := range chats {
-			responses[i] = res.ChatResponse{
-				ID:              ch.ID,
-				SessionID:       ch.Session.ID,
-				SessionTitle:    ch.Session.Title,
-				MessageFromUser: ch.MessageFromUser,
-				MessageFromBot:  ch.MessageFromBot,
-				CreatedAt:       ch.CreatedAt,
-			}
+			responses[i] = res.ChatResponseFromModel(&ch)
 		}
 
 		render.JSON(w, r, Response{

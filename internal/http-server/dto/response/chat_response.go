@@ -6,21 +6,21 @@ import (
 )
 
 type ChatResponse struct {
-	ID              uint      `json:"id"`
-	SessionID       uint      `json:"session_id"`
-	SessionTitle    string    `json:"session_title"`
-	MessageFromUser string    `json:"message_from_user"`
-	MessageFromBot  string    `json:"message_from_bot"`
-	CreatedAt       time.Time `json:"created_at"`
+	ID           uint      `json:"id"`
+	SessionID    uint      `json:"session_id"`
+	SessionTitle string    `json:"session_title"`
+	CreatedAt    time.Time `json:"created_at"`
+	Content      string    `json:"content"`
+	Role         string    `json:"role"`
 }
 
-func ChatResponseFromModel(chat *models.ChatHistory) ChatResponse {
+func ChatResponseFromModel(chat *models.ChatMessage) ChatResponse {
 	return ChatResponse{
-		ID:              chat.ID,
-		SessionID:       chat.SessionID,
-		SessionTitle:    chat.Session.Title,
-		MessageFromUser: chat.MessageFromUser,
-		MessageFromBot:  chat.MessageFromBot,
-		CreatedAt:       chat.CreatedAt,
+		ID:           chat.ID,
+		SessionID:    chat.SessionID,
+		SessionTitle: chat.Session.Title,
+		CreatedAt:    chat.CreatedAt,
+		Content:      chat.Content,
+		Role:         chat.Role,
 	}
 }

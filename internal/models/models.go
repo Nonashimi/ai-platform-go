@@ -48,18 +48,21 @@ type SessionHistory struct {
 	Title     string `gorm:"size:255;not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Chats     []ChatHistory `gorm:"foreignKey:SessionID"`
+	Chats     []ChatMessage `gorm:"foreignKey:SessionID"`
 }
 
-// Чат
-type ChatHistory struct {
-	ID              uint `gorm:"primaryKey"`
-	SessionID       uint
-	Session         SessionHistory `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	MessageFromUser string         `gorm:"type:text"`
-	MessageFromBot  string         `gorm:"type:text"`
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+type ChatMessage struct {
+	ID        uint `gorm:"primaryKey"`
+	SessionID uint
+	Session   SessionHistory `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+
+	// "user" или "bot"
+	Role string `gorm:"type:varchar(10)"`
+
+	// Сам текст сообщения
+	Content string `gorm:"type:text"`
+
+	CreatedAt time.Time
 }
 
 // Тест

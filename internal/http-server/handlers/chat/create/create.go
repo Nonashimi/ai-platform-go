@@ -14,7 +14,7 @@ import (
 )
 
 type ChatCreate interface {
-	CreateChat(chat *models.ChatHistory) (*models.ChatHistory, error)
+	CreateChat(chat *models.ChatMessage) (*models.ChatMessage, error)
 }
 
 type SessionCreate interface {

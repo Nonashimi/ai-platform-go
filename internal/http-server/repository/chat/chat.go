@@ -14,7 +14,7 @@ func NewChatnRepo(db *gorm.DB) *ChatRepository {
 	return &ChatRepository{db: db}
 }
 
-func (r *ChatRepository) CreateChat(chat *models.ChatHistory) (*models.ChatHistory, error) {
+func (r *ChatRepository) CreateChat(chat *models.ChatMessage) (*models.ChatMessage, error) {
 	if err := r.db.Create(chat).Error; err != nil {
 		return nil, err
 	}
@@ -28,8 +28,8 @@ func (r *ChatRepository) CreateChat(chat *models.ChatHistory) (*models.ChatHisto
 	return chat, nil
 }
 
-func (r *ChatRepository) GetChatBySessionId(sessionId uint) ([]models.ChatHistory, error) {
-	var chats []models.ChatHistory
+func (r *ChatRepository) GetChatBySessionId(sessionId uint) ([]models.ChatMessage, error) {
+	var chats []models.ChatMessage
 	if err := r.db.
 		Preload("Session").
 		Preload("Session.Student").

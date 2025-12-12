@@ -6,8 +6,8 @@ import (
 )
 
 type ChatRepository interface {
-	CreateChat(chat *models.ChatHistory) (*models.ChatHistory, error)
-	GetChatBySessionId(sessionId uint) ([]models.ChatHistory, error)
+	CreateChat(chat *models.ChatMessage) (*models.ChatMessage, error)
+	GetChatBySessionId(sessionId uint) ([]models.ChatMessage, error)
 }
 
 type SessionRepository interface {
@@ -25,7 +25,7 @@ func New(chatRepo ChatRepository, sessionRepo SessionRepository) *Service {
 	}
 }
 
-func (s *Service) CreateMessage(userID uint, sessionID *uint, message string) (*models.ChatHistory, error) {
+func (s *Service) CreateMessage(userID uint, sessionID *uint, message string) (*models.ChatMessage, error) {
 	if message == "" {
 		return nil, errors.New("message cannot be empty")
 	}
@@ -42,16 +42,16 @@ func (s *Service) CreateMessage(userID uint, sessionID *uint, message string) (*
 		sessionID = &newSession.ID
 	}
 
-	chat := &models.ChatHistory{
-		SessionID:       *sessionID,
-		MessageFromUser: message,
-		MessageFromBot:  "Hello world",
+	chat := &models.ChatMessage{
+		SessionID: *sessionID,
+		Role:      "user",
+		Content:   message,
 	}
 
 	return s.chatRepo.CreateChat(chat)
 }
 
-func (s *Service) GetChatBySessionId(sessionId uint) ([]models.ChatHistory, error) {
+func (s *Service) GetChatBySessionId(sessionId uint) ([]models.ChatMessage, error) {
 	chats, err := s.chatRepo.GetChatBySessionId(sessionId)
 	if err != nil {
 		return nil, err

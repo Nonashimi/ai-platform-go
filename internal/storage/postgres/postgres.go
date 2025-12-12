@@ -32,7 +32,7 @@ func New(dsn string) (*gorm.DB, error) {
 		&models.User{},
 		&models.TeacherStudent{},
 		&models.SessionHistory{},
-		&models.ChatHistory{},
+		&models.ChatMessage{},
 		&models.Test{},
 		&models.TestQuestion{},
 		&models.TestResult{},
